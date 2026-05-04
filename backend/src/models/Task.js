@@ -86,6 +86,7 @@ const taskSchema = new mongoose.Schema({
 taskSchema.index(
     {roomId: 1, hotelId: 1, date: 1, priority: 1},
     { unique: true }
-)
+);
+
 
 module.exports = mongoose.model('Task', taskSchema);
