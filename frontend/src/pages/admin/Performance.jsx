@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Layout from '../../components/layout/Layout';
 import Card, { CardHead, CardBody } from '../../components/common/Card';
 import { InlineLoader } from '../../components/common/Loader';
@@ -7,7 +7,6 @@ import Badge from '../../components/common/Badge';
 import { usePerformance } from '../../hooks/useStaff';
 import { getPendingLeaves, updateLeave } from '../../api/leave.api';
 import { getInitials, getCompletionRate, formatDate } from '../../utils/formatters';
-import { useEffect } from 'react';
 import '../../styles/dashboard.css';
 import '../../styles/components.css';
 
@@ -49,48 +48,50 @@ export default function Performance() {
           <CardHead title="Staff Performance Today" />
           <CardBody flush>
             {loading ? <InlineLoader /> : (
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Staff Member</th>
-                    <th>Skill</th>
-                    <th>Assigned</th>
-                    <th>Completed</th>
-                    <th>Pending</th>
-                    <th>Progress</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.map((item, i) => {
-                    const rate = getCompletionRate(item.completed, item.assigned);
-                    return (
-                      <tr key={item.staff.id} style={{ animation: `fadeInUp 0.35s ${i * 35}ms ease both` }}>
-                        <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div className="avatar avatar-md">{getInitials(item.staff.name)}</div>
-                            <div>
-                              <div style={{ fontWeight: '600' }}>{item.staff.name}</div>
-                              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Floor {item.staff.assignedFloor}</div>
+              <div className="table-wrap">
+                <table className="table table-stack">
+                  <thead>
+                    <tr>
+                      <th>Staff Member</th>
+                      <th>Skill</th>
+                      <th>Assigned</th>
+                      <th>Completed</th>
+                      <th>Pending</th>
+                      <th>Progress</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.map((item, i) => {
+                      const rate = getCompletionRate(item.completed, item.assigned);
+                      return (
+                        <tr key={item.staff.id} style={{ animation: `fadeInUp 0.35s ${i * 35}ms ease both` }}>
+                          <td data-label="Staff Member">
+                            <div className="inline-cluster">
+                              <div className="avatar avatar-md">{getInitials(item.staff.name)}</div>
+                              <div className="inline-cluster-copy">
+                                <div className="copy-strong">{item.staff.name}</div>
+                                <div className="copy-subtle">Floor {item.staff.assignedFloor}</div>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td><Badge type={item.staff.skillLevel}>{item.staff.skillLevel}</Badge></td>
-                        <td style={{ color: 'var(--text-secondary)' }}>{item.assigned}</td>
-                        <td style={{ color: 'var(--status-completed)', fontWeight: '600' }}>{item.completed}</td>
-                        <td style={{ color: item.pending > 0 ? 'var(--status-pending)' : 'var(--text-muted)' }}>{item.pending}</td>
-                        <td style={{ width: '130px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div className="progress-bar" style={{ flex: 1 }}>
-                              <div className="progress-fill" style={{ width: `${rate}%` }} />
+                          </td>
+                          <td data-label="Skill"><Badge type={item.staff.skillLevel}>{item.staff.skillLevel}</Badge></td>
+                          <td data-label="Assigned" className="copy-muted">{item.assigned}</td>
+                          <td data-label="Completed" style={{ color: 'var(--status-completed)', fontWeight: '600' }}>{item.completed}</td>
+                          <td data-label="Pending" style={{ color: item.pending > 0 ? 'var(--status-pending)' : 'var(--text-muted)' }}>{item.pending}</td>
+                          <td data-label="Progress">
+                            <div className="inline-cluster">
+                              <div className="progress-bar" style={{ flex: 1 }}>
+                                <div className="progress-fill" style={{ width: `${rate}%` }} />
+                              </div>
+                              <span className="copy-subtle" style={{ width: '32px' }}>{rate}%</span>
                             </div>
-                            <span style={{ fontSize: '11px', color: 'var(--text-secondary)', width: '30px' }}>{rate}%</span>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             )}
           </CardBody>
         </Card>
@@ -98,34 +99,34 @@ export default function Performance() {
         leavesLoading ? <InlineLoader /> : (
           leaves.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-icon">📅</div>
+              <div className="empty-icon">[]</div>
               <p className="empty-text">No pending leave requests</p>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div className="stack-list">
               {leaves.map((leave, i) => (
                 <Card key={leave._id} style={{ animationDelay: `${i * 50}ms` }}>
                   <CardBody>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
-                      <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', flex: 1, minWidth: 0 }}>
+                    <div className="leave-request-row">
+                      <div className="leave-request-info">
                         <div className="avatar avatar-lg">{getInitials(leave.staffId?.name)}</div>
-                        <div style={{ minWidth: 0 }}>
-                          <div style={{ fontWeight: '600', marginBottom: '4px' }}>{leave.staffId?.name}</div>
-                          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                            📅 Leave on {formatDate(leave.leaveDate)}
+                        <div className="inline-cluster-copy">
+                          <div className="copy-strong" style={{ marginBottom: '4px' }}>{leave.staffId?.name}</div>
+                          <div className="copy-muted" style={{ marginBottom: '6px' }}>
+                            Leave on {formatDate(leave.leaveDate)}
                           </div>
-                          <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{leave.reason}</div>
-                          <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                          <div className="fluid-note">{leave.reason}</div>
+                          <div className="copy-subtle" style={{ marginTop: '4px' }}>
                             Applied: {formatDate(leave.appliedAt)}
                           </div>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                      <div className="leave-request-actions">
                         <Button variant="success" size="sm" onClick={() => handleLeave(leave._id, 'approved')}>
-                          ✓ Approve
+                          Approve
                         </Button>
                         <Button variant="danger" size="sm" onClick={() => handleLeave(leave._id, 'rejected')}>
-                          ✕ Reject
+                          Reject
                         </Button>
                       </div>
                     </div>

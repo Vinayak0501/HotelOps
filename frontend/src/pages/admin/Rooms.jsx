@@ -43,32 +43,34 @@ export default function Rooms() {
         <Card>
           <CardHead title="Room Overview" action={`${rooms.length} rooms`} />
           <CardBody flush>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Room No.</th>
-                  <th>Type</th>
-                  <th>Floor</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rooms.map((room, i) => (
-                  <tr key={room._id} style={{ animation: `fadeInUp 0.35s ${i * 25}ms ease both` }}>
-                    <td style={{ fontWeight: '600' }}>Room {room.roomNo}</td>
-                    <td><Badge type="gold">{room.roomType}</Badge></td>
-                    <td style={{ color: 'var(--text-secondary)' }}>Floor {room.floor}</td>
-                    <td><Badge type={statusBadgeType(room.status)}>{room.status}</Badge></td>
-                    <td>
-                      <Button variant="ghost" size="sm" onClick={() => { setModal(room); setNewStatus(room.status); }}>
-                        Update Status
-                      </Button>
-                    </td>
+            <div className="table-wrap">
+              <table className="table table-stack">
+                <thead>
+                  <tr>
+                    <th>Room No.</th>
+                    <th>Type</th>
+                    <th>Floor</th>
+                    <th>Status</th>
+                    <th>Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {rooms.map((room, i) => (
+                    <tr key={room._id} style={{ animation: `fadeInUp 0.35s ${i * 25}ms ease both` }}>
+                      <td data-label="Room No." className="copy-strong">Room {room.roomNo}</td>
+                      <td data-label="Type"><Badge type="gold">{room.roomType}</Badge></td>
+                      <td data-label="Floor" className="copy-muted">Floor {room.floor}</td>
+                      <td data-label="Status"><Badge type={statusBadgeType(room.status)}>{room.status}</Badge></td>
+                      <td data-label="Action">
+                        <Button variant="ghost" size="sm" onClick={() => { setModal(room); setNewStatus(room.status); }}>
+                          Update Status
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </CardBody>
         </Card>
       )}
@@ -77,12 +79,12 @@ export default function Rooms() {
         <Modal
           title={`Update Room ${modal.roomNo}`}
           onClose={() => setModal(null)}
-          footer={
+          footer={(
             <>
               <Button variant="ghost" onClick={() => setModal(null)}>Cancel</Button>
               <Button variant="primary" onClick={handleUpdate} loading={updating}>Update</Button>
             </>
-          }
+          )}
         >
           <div className="form-group">
             <label className="form-label">New Status</label>

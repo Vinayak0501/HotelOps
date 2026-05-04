@@ -1,87 +1,57 @@
-// ADMIN --> see the tasks for the day
-
-import { useState, useEffect } from "react";
-import Layout  from "../../components/layout/Layout";
-import Card, { CardHead, CardBody} from "../../components/common/Card";
-import { InlineLoader } from "../../components/common/Loader";
+import { useState, useEffect } from 'react';
+import Layout from '../../components/layout/Layout';
+import Card, { CardBody } from '../../components/common/Card';
+import { InlineLoader } from '../../components/common/Loader';
 import Modal from '../../components/common/Modal';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
-import { getTodayTasks, manualAssignTask } from "../../api/admin.api";
-import { getAllStaff } from "../../api/staff.api";
-import { getInitials, getPriorityEmoji, getPriorityLabel } from "../../utils/formatters";
+import { getTodayTasks, manualAssignTask } from '../../api/admin.api';
+import { getAllStaff } from '../../api/staff.api';
+import { getInitials, getPriorityEmoji, getPriorityLabel } from '../../utils/formatters';
 import '../../styles/tasks.css';
 import '../../styles/components.css';
 
-
 const FILTERS = ['all', 'pending', 'assigned', 'in-progress', 'paused', 'completed'];
 
+export default function AdminTasks() {
+  const [tasks, setTasks] = useState([]);
+  const [staff, setStaff] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all');
+  const [modal, setModal] = useState(null);
+  const [selectedStaff, setSelectedStaff] = useState('');
+  const [assigning, setAssigning] = useState(false);
 
-export default function AdminTasks(){
+  useEffect(() => {
+    Promise.all([getTodayTasks(), getAllStaff()])
+      .then(([taskRes, staffRes]) => {
+        setTasks(taskRes.data.tasks);
+        setStaff(staffRes.data);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
-    const [ tasks, setTasks ] = useState([]);
-    const [ staff, setStaff ] = useState([]);
-    const [ loading, setLoading ] = useState(true);
-    const [ filter, setFilter ] = useState('all');
-    const [ modal, setModal ] = useState(null);
-    const [ selectedStaff, setSelectedStaff ] = useState('');
-    const [ assigning, setAssigning ] = useState(false);
+  async function handleAssign() {
+    if (!selectedStaff || !modal) return;
 
-
-    // Fetch the data
-    useEffect(() => {
-        // Promise.all --> used to run multiple async operations in parallel --> wait until all of them finishes
-
-        Promise.all([getTodayTasks(), getAllStaff()])
-        .then(([taskRes, staffRes]) => {
-            setTasks(taskRes.data.tasks);
-            setStaff(staffRes.data);
-        })
-        .catch(console.error)
-        .finally(() => setLoading(false));
-
-    },[]);
-
-
-    // Action handler
-    async function handleAssign() {
-        
-        // if someone clicks 'Assign' without picking a staff --> stop function immediately
-        // modal --> taskId
-        if(!selectedStaff || !modal){
-            return;
-        }
-
-        setAssigning(true); // turn the spinner on
-
-        try{
-
-            // assign taskId (modal) to staffId (selectedStaff)
-            await manualAssignTask(modal, selectedStaff);
-            // fetch fresh list of tasks from DB so that UI updates instantly
-            const res = await getTodayTasks();
-            setTasks(res.data.tasks);
-            setModal(null);
-            setSelectedStaff('');
-
-        }
-
-        catch(err){
-            alert(err.response?.data?.message || 'Assignment failed');
-        }
-
-        finally{
-            setAssigning(false);
-        }
+    setAssigning(true);
+    try {
+      await manualAssignTask(modal, selectedStaff);
+      const res = await getTodayTasks();
+      setTasks(res.data.tasks);
+      setModal(null);
+      setSelectedStaff('');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Assignment failed');
+    } finally {
+      setAssigning(false);
     }
+  }
 
-    // Derived state (filtering) --> before rendering the screen --> React --> looks at currently active filter tab
-    // if 'all' -> shows everything
-    // if 'pending' -> filters everything except pending task
+  const filtered = filter === 'all' ? tasks : tasks.filter(t => t.status === filter);
 
-    const filtered = filter === 'all' ? tasks : tasks.filter(t => t.status === filter);
-
-   return (
+  return (
     <Layout title="Tasks Today" subtitle="All cleaning tasks across the hotel">
       {loading ? <InlineLoader /> : (
         <>
@@ -104,60 +74,60 @@ export default function AdminTasks(){
 
           <Card>
             <CardBody flush>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Room</th>
-                    <th>Priority</th>
-                    <th>Assigned To</th>
-                    <th>Est. Time</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((task, i) => (
-                    <tr key={task._id} style={{ animation: `fadeInUp 0.35s ${i * 30}ms ease both` }}>
-                      <td>
-                        <div style={{ fontWeight: '600', fontSize: '13px' }}>Room {task.roomId?.roomNo}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-                          Floor {task.roomId?.floor} · {task.roomId?.roomType}
-                        </div>
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span>{getPriorityEmoji(task.priority)}</span>
-                          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{getPriorityLabel(task.priority)}</span>
-                        </div>
-                      </td>
-                      <td>
-                        {task.assignedTo ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div className="avatar avatar-sm">{getInitials(task.assignedTo?.name)}</div>
-                            <span style={{ fontSize: '13px' }}>{task.assignedTo?.name}</span>
-                          </div>
-                        ) : (
-                          <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>— Unassigned</span>
-                        )}
-                      </td>
-                      <td style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>{task.estimatedTime} min</td>
-                      <td><Badge type={task.status}>{task.status}</Badge></td>
-                      <td>
-                        <Button variant="ghost" size="sm" onClick={() => setModal(task._id)}>
-                          Reassign
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                  {filtered.length === 0 && (
+              <div className="table-wrap">
+                <table className="table table-stack">
+                  <thead>
                     <tr>
-                      <td colSpan={6} style={{ textAlign: 'center', padding: '48px', color: 'var(--text-secondary)' }}>
-                        No tasks in this category
-                      </td>
+                      <th>Room</th>
+                      <th>Priority</th>
+                      <th>Assigned To</th>
+                      <th>Est. Time</th>
+                      <th>Status</th>
+                      <th>Action</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filtered.map((task, i) => (
+                      <tr key={task._id} style={{ animation: `fadeInUp 0.35s ${i * 30}ms ease both` }}>
+                        <td data-label="Room">
+                          <div className="copy-strong">Room {task.roomId?.roomNo}</div>
+                          <div className="copy-subtle">Floor {task.roomId?.floor} | {task.roomId?.roomType}</div>
+                        </td>
+                        <td data-label="Priority">
+                          <div className="priority-inline">
+                            <span>{getPriorityEmoji(task.priority)}</span>
+                            <span className="copy-muted">{getPriorityLabel(task.priority)}</span>
+                          </div>
+                        </td>
+                        <td data-label="Assigned To">
+                          {task.assignedTo ? (
+                            <div className="inline-cluster">
+                              <div className="avatar avatar-sm">{getInitials(task.assignedTo?.name)}</div>
+                              <span>{task.assignedTo?.name}</span>
+                            </div>
+                          ) : (
+                            <span className="copy-subtle">Unassigned</span>
+                          )}
+                        </td>
+                        <td data-label="Est. Time" className="copy-muted">{task.estimatedTime} min</td>
+                        <td data-label="Status"><Badge type={task.status}>{task.status}</Badge></td>
+                        <td data-label="Action">
+                          <Button variant="ghost" size="sm" onClick={() => setModal(task._id)}>
+                            Reassign
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {filtered.length === 0 && (
+                      <tr>
+                        <td colSpan={6} style={{ textAlign: 'center', padding: '48px', color: 'var(--text-secondary)' }}>
+                          No tasks in this category
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </CardBody>
           </Card>
         </>
@@ -167,14 +137,14 @@ export default function AdminTasks(){
         <Modal
           title="Manually Assign Task"
           onClose={() => { setModal(null); setSelectedStaff(''); }}
-          footer={
+          footer={(
             <>
               <Button variant="ghost" onClick={() => { setModal(null); setSelectedStaff(''); }}>Cancel</Button>
               <Button variant="primary" onClick={handleAssign} loading={assigning} disabled={!selectedStaff}>
                 Assign Task
               </Button>
             </>
-          }
+          )}
         >
           <div className="form-group">
             <label className="form-label">Select Staff Member</label>
@@ -186,7 +156,7 @@ export default function AdminTasks(){
               <option value="">Choose a staff member...</option>
               {staff.map(s => (
                 <option key={s._id} value={s._id}>
-                  {s.name} — {s.skillLevel} · Floor {s.assignedFloor}
+                  {`${s.name} - ${s.skillLevel} | Floor ${s.assignedFloor ?? '-'}`}
                 </option>
               ))}
             </select>

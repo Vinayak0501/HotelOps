@@ -663,10 +663,6 @@
     gap: 10px;
   }
 
-  .task-actions {
-    display: none;
-  }
-
   .theme-menu {
     right: -8px;
     width: min(320px, calc(100vw - 20px));

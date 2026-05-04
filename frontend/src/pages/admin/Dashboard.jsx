@@ -108,12 +108,12 @@ export default function AdminDashboard() {
             </CardBody>
           </Card>
 
-          <div style={{ marginTop: '16px' }}>
+          <div className="mobile-section-gap">
             <Card>
               <CardHead title="Today's Attendance" action={attendance ? `${attendance.present}/${attendance.totalStaff} present` : ''} />
               <CardBody flush>
                 <div className="table-wrap">
-                  <table className="table">
+                  <table className="table table-stack">
                     <thead>
                       <tr>
                         <th>Staff Member</th>
@@ -126,22 +126,22 @@ export default function AdminDashboard() {
                     <tbody>
                       {attendance?.attendance?.map((item, index) => (
                         <tr key={item._id} style={{ animation: `fadeInUp 0.35s ${index * 35}ms ease both` }}>
-                          <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <td data-label="Staff Member">
+                            <div className="inline-cluster">
                               <div className="avatar avatar-sm">{getInitials(item.staffId?.name)}</div>
-                              <span style={{ fontWeight: '500' }}>{item.staffId?.name}</span>
+                              <span className="copy-strong">{item.staffId?.name}</span>
                             </div>
                           </td>
-                          <td><span className={`badge badge-${item.staffId?.skillLevel}`}>{item.staffId?.skillLevel}</span></td>
-                          <td>
+                          <td data-label="Skill"><span className={`badge badge-${item.staffId?.skillLevel}`}>{item.staffId?.skillLevel}</span></td>
+                          <td data-label="Check In">
                             {formatTime(item.checkInTime)}
                             {item.isLate && <span className="badge badge-pending" style={{ marginLeft: '6px' }}>Late</span>}
                           </td>
-                          <td style={{ color: 'var(--text-secondary)' }}>{formatTime(item.checkOutTime)}</td>
-                          <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <td data-label="Check Out" className="copy-muted">{formatTime(item.checkOutTime)}</td>
+                          <td data-label="Status">
+                            <div className="status-inline">
                               <div className={`status-dot ${item.checkOutTime ? 'inactive' : 'active'}`} />
-                              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                              <span className="copy-muted">
                                 {item.checkOutTime ? 'Done' : 'On Duty'}
                               </span>
                             </div>

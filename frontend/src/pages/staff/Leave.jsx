@@ -48,7 +48,7 @@ export default function Leave() {
           <CardHead title="Apply for Leave" />
           <CardBody>
             {alert && (
-              <div style={{ marginBottom: '16px' }}>
+              <div className="mobile-section-gap">
                 <Alert type={alert.type} onClose={() => setAlert(null)}>{alert.msg}</Alert>
               </div>
             )}
@@ -87,34 +87,23 @@ export default function Leave() {
             {loading ? <InlineLoader /> : (
               leaves.length === 0 ? (
                 <div className="empty-state">
-                  <div className="empty-icon">📅</div>
+                  <div className="empty-icon">[]</div>
                   <p className="empty-text">No leave requests yet</p>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div className="card-surface-list">
                   {leaves.map((leave, i) => (
                     <div
                       key={leave._id}
-                      style={{
-                        padding: '12px 14px',
-                        background: 'var(--bg-tertiary)',
-                        borderRadius: 'var(--radius-md)',
-                        border: '1px solid var(--border)',
-                        animation: `fadeInUp 0.35s ${i * 45}ms ease both`
-                      }}
+                      className="surface-item"
+                      style={{ animation: `fadeInUp 0.35s ${i * 45}ms ease both` }}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
-                        <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
-                          {formatDate(leave.leaveDate)}
-                        </span>
+                      <div className="surface-item-head">
+                        <span className="copy-strong">{formatDate(leave.leaveDate)}</span>
                         <Badge type={leave.status}>{leave.status}</Badge>
                       </div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '3px' }}>
-                        {leave.reason}
-                      </div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                        Applied: {formatDate(leave.appliedAt)}
-                      </div>
+                      <div className="surface-item-copy">{leave.reason}</div>
+                      <div className="surface-item-meta">Applied: {formatDate(leave.appliedAt)}</div>
                     </div>
                   ))}
                 </div>

@@ -15,37 +15,35 @@ export default function Staff() {
         <Card>
           <CardHead title="Staff Directory" action={`${staff.length} members`} />
           <CardBody flush>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Skill Level</th>
-                  <th>Assigned Floor</th>
-                  <th>Workload</th>
-                </tr>
-              </thead>
-              <tbody>
-                {staff.map((s, i) => (
-                  <tr key={s._id} style={{ animation: `fadeInUp 0.35s ${i * 35}ms ease both` }}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div className="avatar avatar-md">{getInitials(s.name)}</div>
-                        <span style={{ fontWeight: '600' }}>{s.name}</span>
-                      </div>
-                    </td>
-                    <td style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>{s.email}</td>
-                    <td><Badge type={s.skillLevel}>{s.skillLevel}</Badge></td>
-                    <td style={{ color: 'var(--text-secondary)' }}>Floor {s.assignedFloor || '—'}</td>
-                    <td>
-                      <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                        {s.assignedTime || 0} min assigned
-                      </span>
-                    </td>
+            <div className="table-wrap">
+              <table className="table table-stack">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Skill Level</th>
+                    <th>Assigned Floor</th>
+                    <th>Workload</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {staff.map((s, i) => (
+                    <tr key={s._id} style={{ animation: `fadeInUp 0.35s ${i * 35}ms ease both` }}>
+                      <td data-label="Name">
+                        <div className="inline-cluster">
+                          <div className="avatar avatar-md">{getInitials(s.name)}</div>
+                          <span className="copy-strong">{s.name}</span>
+                        </div>
+                      </td>
+                      <td data-label="Email" className="copy-muted">{s.email}</td>
+                      <td data-label="Skill Level"><Badge type={s.skillLevel}>{s.skillLevel}</Badge></td>
+                      <td data-label="Assigned Floor" className="copy-muted">Floor {s.assignedFloor || '-'}</td>
+                      <td data-label="Workload" className="copy-muted">{s.assignedTime || 0} min assigned</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </CardBody>
         </Card>
       )}

@@ -157,13 +157,13 @@ export default function StaffDashboard() {
         <>
           <StatsCards stats={stats} />
 
-          <div className="grid-2" style={{ marginBottom: '16px' }}>
+          <div className="grid-2 mobile-section-gap">
             <Card>
               <CardHead title="Attendance" />
               <CardBody>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                <div className="status-inline" style={{ marginBottom: '16px' }}>
                   <div className={`status-dot ${attendanceStatus.checkedIn ? 'active' : 'inactive'}`} />
-                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  <span className="copy-muted">
                     {getAttendanceCopy()}
                   </span>
                 </div>
@@ -196,7 +196,7 @@ export default function StaffDashboard() {
                 )}
 
                 {attendanceStatus.currentShift && (
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '10px' }}>
+                  <div className="copy-subtle" style={{ marginTop: '10px' }}>
                     Scheduled shift: {attendanceStatus.currentShift.name} ({attendanceStatus.currentShift.start} - {attendanceStatus.currentShift.end})
                   </div>
                 )}
@@ -218,14 +218,14 @@ export default function StaffDashboard() {
             </Card>
           </div>
 
-          <div className="grid-2" style={{ marginBottom: '16px' }}>
+          <div className="grid-2 mobile-section-gap">
             <Card>
               <CardHead title="Completion Rate" action={<span style={{ color: 'var(--gold)', fontFamily: 'var(--font-display)', fontSize: '18px' }}>{rate}%</span>} />
               <CardBody>
                 <div className="progress-bar" style={{ marginBottom: '12px', height: '8px' }}>
                   <div className="progress-fill" style={{ width: `${rate}%` }} />
                 </div>
-                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                <div className="copy-muted">
                   {displayCompleted} of {displayTotal} tasks completed {isShiftComplete ? 'this shift' : 'today'}
                 </div>
                 {paused > 0 && (
