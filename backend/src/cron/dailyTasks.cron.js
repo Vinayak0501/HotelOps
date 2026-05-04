@@ -320,7 +320,7 @@ function startDailyTaskCron() {
   }
 
   // Stagger quarter-hour jobs so the process does not try to wake every heavy task on the same second.
-  dailyTaskCron = createCronTask('5 */15 * * * *', handleDailyTaskCron);
+  dailyTaskCron = createCronTask('5 0 4 * * *', handleDailyTaskCron);
   dailyTaskCron.start();
   return dailyTaskCron;
 }
