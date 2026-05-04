@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'http://localhost:3000/api',
+    baseURL: 'https://hotelops-190h.onrender.com/',
     timeout: 10000 // request fails if it takes more than 10 sec
 });
 
