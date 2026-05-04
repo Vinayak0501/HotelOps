@@ -6,7 +6,6 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // register a user
 
 const registerUser = async function(req, res) {
-    
 
     try{
 
@@ -24,17 +23,15 @@ const registerUser = async function(req, res) {
         // check if user already exists
 
         const existingUser = await User.findOne({ email });
-
         if(existingUser){
             return res.status(400).json({
                 message: "User already exists"
             })
         }
 
-
         // hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
 
+        const hashedPassword = await bcrypt.hash(password, 10);
         // create user
 
         const user = await User.create({
@@ -48,9 +45,9 @@ const registerUser = async function(req, res) {
         });
 
         // response (never send password)
+
         res.status(201).json({
             message: "User registered successfully",
-
             user:{
                 id: user._id,
                 name: user.name,
@@ -62,43 +59,49 @@ const registerUser = async function(req, res) {
     }
 
     catch(error){
-
         res.status(500).json({
-            message: "Server error", 
+            message: "Server error",
             error : error.message
         });
     }
 }
 
-
 // login
+
 const loginUser = async function(req, res){
 
     try{
 
-        const { email, password } = req.body;
+        const { email, password, hotelId } = req.body;
 
-        // validation 
+        // validation
 
         if(!email || !password){
-            
+
             return res.status(400).json({
                 message: "Email and password required"
             })
 
         }
 
+        if(!hotelId){
+
+            return res.status(400).json({
+                message: 'HotelId required'
+            })
+        }
+
         // find user
-        const user = await User.findOne({ email });
+
+        const user = await User.findOne({ email, hotelId });
 
         if(!user){
-            
+
             return res.status(400).json({
                 message: "Invalid credentials"
             });
 
         }
-
 
         // compare password
 
@@ -109,9 +112,7 @@ const loginUser = async function(req, res){
             return res.status(400).json({
                 message: "Invalid credentials"
             })
-
         }
-
 
         // create token
 
@@ -120,14 +121,12 @@ const loginUser = async function(req, res){
             id: user._id,
             role: user.role,
             hotelId: user.hotelId
-
         }, JWT_SECRET,
         { expiresIn: '1d'});
 
         res.status(200).json({
             message: "Login successful",
             token: token,
-
             user: {
                 id: user._id,
                 name: user.name,
@@ -138,12 +137,10 @@ const loginUser = async function(req, res){
     }
 
     catch(err){
-        
         res.status(500).json({
             message: "Server error",
             error: err.message
         })
     }
 }
-
 module.exports = { registerUser, loginUser };
