@@ -20,7 +20,7 @@ const adminRoutes = require('./src/routes/admin.routes');
 const notificationRoutes = require('./src/routes/notification.routes');
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  origin: ['http://localhost:5173', 'http://localhost:5174', "https://hotel-ops-sepia.vercel.app"],
   credentials: true,
 }));
 
