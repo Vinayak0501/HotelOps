@@ -76,7 +76,7 @@ const loginUser = async function(req, res){
 
     try{
 
-        const { email, password, hotelId } = req.body;
+        const { email, password } = req.body;
 
         // validation 
 
@@ -88,16 +88,8 @@ const loginUser = async function(req, res){
 
         }
 
-        if(!hotelId){
-
-            return res.status(400).json({
-                message: 'HotelId required'
-            })
-        }
-
-
         // find user
-        const user = await User.findOne({ email, hotelId });
+        const user = await User.findOne({ email });
 
         if(!user){
             

@@ -91,7 +91,7 @@ function startAutoCheckoutCron() {
     return autoCheckoutCronTask;
   }
 
-  autoCheckoutCronTask = createCronTask('*/5 * * * *', handleAutoCheckoutCron);
+  autoCheckoutCronTask = createCronTask('*/10 * * * *', handleAutoCheckoutCron);
   autoCheckoutCronTask.start();
   return autoCheckoutCronTask;
 }
