@@ -89,7 +89,8 @@ function startReassignCron() {
     return reassignCronTask;
   }
 
-  reassignCronTask = createCronTask('15 */15 * * * *', handleReassignCron);
+  // FIXED: Staggered to whole minutes (2, 17, 32, 47) to avoid CPU overlap
+  reassignCronTask = createCronTask('2,17,32,47 * * * *', handleReassignCron);
   reassignCronTask.start();
   return reassignCronTask;
 }
