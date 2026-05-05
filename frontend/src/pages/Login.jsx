@@ -16,7 +16,7 @@ export default function Login() {
 
 
 
-    const [form, setForm] = useState({ email: '', password: '', hotelId: '' });
+    const [form, setForm] = useState({ email: '', password: '' });
 
     const [error, setError] = useState('');
 
@@ -245,37 +245,6 @@ export default function Login() {
                             />
 
                         </div>
-
-
-
-                        <div className="form-group">
-
-                            <label className="form-label">Hotel ID</label>
-
-                            <input
-
-                                className="form-input"
-
-                                type="text"
-
-                                name="hotelId"
-
-                                placeholder="Enter your hotel identifier"
-
-                                value={form.hotelId}
-
-                                onChange={onChange}
-
-                                required
-
-                            />
-
-
-
-                            <div className="form-hint">Contact your hotel admin for the Hotel ID</div>
-
-                        </div>
-
 
 
                         <button className="login-submit" type="submit" disabled={loading}>
